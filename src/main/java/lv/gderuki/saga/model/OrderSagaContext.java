@@ -1,4 +1,4 @@
-package lv.gderuki.sagapatternsim.model;
+package lv.gderuki.saga.model;
 
 import lombok.Getter;
 import lombok.Setter;

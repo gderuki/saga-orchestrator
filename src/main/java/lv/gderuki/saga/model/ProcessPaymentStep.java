@@ -1,6 +1,6 @@
-package lv.gderuki.sagapatternsim.model;
+package lv.gderuki.saga.model;
 
-import lv.gderuki.sagapatternsim.service.PaymentService;
+import lv.gderuki.saga.service.PaymentService;
 
 public class ProcessPaymentStep implements SagaStep<OrderSagaContext> {
 

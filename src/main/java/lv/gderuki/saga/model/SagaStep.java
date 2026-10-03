@@ -1,4 +1,4 @@
-package lv.gderuki.sagapatternsim.model;
+package lv.gderuki.saga.model;
 
 /**
  * Represents a step in a saga.

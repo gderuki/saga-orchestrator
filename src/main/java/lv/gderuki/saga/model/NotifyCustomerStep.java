@@ -1,6 +1,6 @@
-package lv.gderuki.sagapatternsim.model;
+package lv.gderuki.saga.model;
 
-import lv.gderuki.sagapatternsim.service.NotificationService;
+import lv.gderuki.saga.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

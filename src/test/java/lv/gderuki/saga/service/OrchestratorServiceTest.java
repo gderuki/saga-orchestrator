@@ -1,5 +1,6 @@
-package lv.gderuki.sagapatternsim.service;
+package lv.gderuki.saga.service;
 
+import lv.gderuki.saga.exception.SagaExecutionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -55,9 +56,7 @@ public class OrchestratorServiceTest {
         when(paymentService.processPayment(orderId)).thenReturn(false);
 
         // When
-        assertThrows(RuntimeException.class, () -> { // I don't like that we throw RuntimeException here
-            orchestratorService.performTransaction(idempotencyKey);
-        });
+        assertThrows(SagaExecutionException.class, () -> orchestratorService.performTransaction(idempotencyKey));
 
         // Then
         verify(orderService, times(1)).createOrder(idempotencyKey);
@@ -93,7 +92,7 @@ public class OrchestratorServiceTest {
         when(orderService.createOrder(idempotencyKey)).thenReturn(null);
 
         // When
-        assertThrows(RuntimeException.class, () -> orchestratorService.performTransaction(idempotencyKey));
+        assertThrows(SagaExecutionException.class, () -> orchestratorService.performTransaction(idempotencyKey));
 
         // Then
         verify(orderService, times(1)).createOrder(idempotencyKey);

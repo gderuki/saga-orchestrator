@@ -1,7 +1,8 @@
-package lv.gderuki.sagapatternsim.service;
+package lv.gderuki.saga.service;
 
 import lombok.AllArgsConstructor;
-import lv.gderuki.sagapatternsim.model.*;
+import lv.gderuki.saga.exception.SagaExecutionException;
+import lv.gderuki.saga.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayDeque;
@@ -68,7 +69,7 @@ public class OrchestratorService {
                 if (success) {
                     rollbackStack.push(step);
                 } else {
-                    throw new RuntimeException("Step execution failed!"); // go to catch
+                    throw new SagaExecutionException("Step execution failed!"); // go to catch
                 }
             }
         } catch (Exception e) {

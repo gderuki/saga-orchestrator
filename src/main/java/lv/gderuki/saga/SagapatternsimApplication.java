@@ -1,4 +1,4 @@
-package lv.gderuki.sagapatternsim;
+package lv.gderuki.saga;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
