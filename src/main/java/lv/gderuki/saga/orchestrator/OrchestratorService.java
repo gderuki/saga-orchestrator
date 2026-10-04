@@ -1,12 +1,16 @@
 package lv.gderuki.saga.orchestrator;
 
 import lombok.AllArgsConstructor;
-import lv.gderuki.saga.context.OrderSagaContext;
-import lv.gderuki.saga.exception.SagaExecutionException;
+import lv.gderuki.saga.circuitbreaker.CircuitBreaker;
 import lv.gderuki.saga.client.NotificationService;
 import lv.gderuki.saga.client.OrderService;
 import lv.gderuki.saga.client.PaymentService;
-import lv.gderuki.saga.step.*;
+import lv.gderuki.saga.context.OrderSagaContext;
+import lv.gderuki.saga.exception.SagaExecutionException;
+import lv.gderuki.saga.step.CreateOrderStep;
+import lv.gderuki.saga.step.NotifyCustomerStep;
+import lv.gderuki.saga.step.ProcessPaymentStep;
+import lv.gderuki.saga.step.SagaStep;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayDeque;
@@ -20,6 +24,7 @@ public class OrchestratorService {
     private OrderService orderService;
     private PaymentService paymentService;
     private NotificationService notificationService;
+    private CircuitBreaker circuitBreaker;
 
     // this is an old, empirical impl
     // steps:
@@ -59,12 +64,12 @@ public class OrchestratorService {
     /**
      * Executes the given saga steps in order.
      *
-     * @param steps the saga steps to execute
+     * @param steps   the saga steps to execute
      * @param context the context to pass to the saga steps
      */
     @SuppressWarnings("unused")
     public void execute(List<SagaStep<OrderSagaContext>> steps, OrderSagaContext context) {
-            Deque<SagaStep<OrderSagaContext>> rollbackStack = new ArrayDeque<>();
+        Deque<SagaStep<OrderSagaContext>> rollbackStack = new ArrayDeque<>();
 
         try {
             for (SagaStep<OrderSagaContext> step : steps) {
@@ -92,9 +97,9 @@ public class OrchestratorService {
         OrderSagaContext context = new OrderSagaContext(idempotencyKey);
 
         execute(List.of(
-            new CreateOrderStep(this.orderService),
-            new ProcessPaymentStep(this.paymentService),
-            new NotifyCustomerStep(this.notificationService)
+                new CreateOrderStep(this.orderService),
+                new ProcessPaymentStep(this.paymentService),
+                new NotifyCustomerStep(this.notificationService, this.circuitBreaker)
         ), context);
     }
 

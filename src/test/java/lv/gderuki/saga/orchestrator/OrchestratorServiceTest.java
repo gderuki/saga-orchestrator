@@ -1,5 +1,6 @@
 package lv.gderuki.saga.orchestrator;
 
+import lv.gderuki.saga.circuitbreaker.CircuitBreaker;
 import lv.gderuki.saga.client.NotificationService;
 import lv.gderuki.saga.client.OrderService;
 import lv.gderuki.saga.client.PaymentService;
@@ -25,6 +26,9 @@ public class OrchestratorServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private CircuitBreaker circuitBreaker;
+
     @InjectMocks
     private OrchestratorService orchestratorService;
 
@@ -36,6 +40,7 @@ public class OrchestratorServiceTest {
 
         when(orderService.createOrder(idempotencyKey)).thenReturn(orderId);
         when(paymentService.processPayment(orderId)).thenReturn(true);
+        when(circuitBreaker.allowRequest()).thenReturn(true);
         when(notificationService.sendSMS(orderId)).thenReturn(true);
 
         // When
@@ -45,6 +50,7 @@ public class OrchestratorServiceTest {
         verify(orderService, times(1)).createOrder(idempotencyKey);
         verify(paymentService, times(1)).processPayment(orderId);
         verify(notificationService, times(1)).sendSMS(orderId);
+        verify(circuitBreaker, times(1)).allowRequest();
 
         verify(orderService, never()).rollbackOrder(orderId);
     }
@@ -75,6 +81,7 @@ public class OrchestratorServiceTest {
 
         when(orderService.createOrder(idempotencyKey)).thenReturn(orderId);
         when(paymentService.processPayment(orderId)).thenReturn(true);
+        when(circuitBreaker.allowRequest()).thenReturn(true, true, true);
         when(notificationService.sendSMS(orderId)).thenReturn(false, false, false);
 
         // When
@@ -84,6 +91,7 @@ public class OrchestratorServiceTest {
         verify(orderService, times(1)).createOrder(idempotencyKey);
         verify(paymentService, times(1)).processPayment(orderId);
         verify(notificationService, times(3)).sendSMS(orderId);
+        verify(circuitBreaker, times(3)).recordFailure();
 
         verify(orderService, never()).rollbackOrder(idempotencyKey);
     }

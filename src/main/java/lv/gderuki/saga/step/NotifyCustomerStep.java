@@ -1,36 +1,49 @@
 package lv.gderuki.saga.step;
 
+import lv.gderuki.saga.circuitbreaker.CircuitBreaker;
 import lv.gderuki.saga.context.OrderSagaContext;
 import lv.gderuki.saga.client.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NotifyCustomerStep implements SagaStep<OrderSagaContext> {
 
     private static final Logger log = LoggerFactory.getLogger(NotifyCustomerStep.class);
 
     private final NotificationService notificationService;
+    private final CircuitBreaker circuitBreaker;
 
-    public NotifyCustomerStep(NotificationService notificationService) {
+
+    public NotifyCustomerStep(NotificationService notificationService, CircuitBreaker circuitBreaker) {
         this.notificationService = notificationService;
+        this.circuitBreaker = circuitBreaker;
     }
 
     @Override
     public boolean process(OrderSagaContext context) {
-        int retries = 3;
-
-        for (int i = 0; i < retries; i++) {
-            boolean success = notificationService.sendSMS(context.getOrderId());
-
-            if (success) {
-                return true;
+        int attempts = 0;
+        while (attempts < 3) {
+            if (!circuitBreaker.allowRequest()) {
+                log.error("Circuit breaker is open! Call blocked.");
+                return true; // Pivot step — не роняем сагу
             }
+
+            try {
+                boolean sent = notificationService.sendSMS(context.getOrderId());
+                if (sent) {
+                    circuitBreaker.recordSuccess();
+                    return true;
+                } else {
+                    circuitBreaker.recordFailure();
+                }
+            } catch (Exception e) {
+                circuitBreaker.recordFailure();
+            }
+            attempts++;
         }
-
-        // TODO: add some worker with queue here, to retry sending SMS after 24h or something
-        log.error("Failed to notify customer after {} retries", retries);
-
-        return true; // true here because we don't want to rollback
+        return true; // Проглатываем ошибку для Pivot Step
     }
 
     @Override
