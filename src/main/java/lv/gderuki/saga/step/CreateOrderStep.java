@@ -1,6 +1,7 @@
-package lv.gderuki.saga.model;
+package lv.gderuki.saga.step;
 
-import lv.gderuki.saga.service.OrderService;
+import lv.gderuki.saga.context.OrderSagaContext;
+import lv.gderuki.saga.client.OrderService;
 
 public class CreateOrderStep implements SagaStep<OrderSagaContext> {
 

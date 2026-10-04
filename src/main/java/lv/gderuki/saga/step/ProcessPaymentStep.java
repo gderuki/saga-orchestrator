@@ -1,6 +1,7 @@
-package lv.gderuki.saga.model;
+package lv.gderuki.saga.step;
 
-import lv.gderuki.saga.service.PaymentService;
+import lv.gderuki.saga.context.OrderSagaContext;
+import lv.gderuki.saga.client.PaymentService;
 
 public class ProcessPaymentStep implements SagaStep<OrderSagaContext> {
 

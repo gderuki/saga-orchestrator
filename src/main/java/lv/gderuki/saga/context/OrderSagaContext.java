@@ -1,4 +1,4 @@
-package lv.gderuki.saga.model;
+package lv.gderuki.saga.context;
 
 import lombok.Getter;
 import lombok.Setter;

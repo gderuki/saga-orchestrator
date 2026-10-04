@@ -1,6 +1,7 @@
-package lv.gderuki.saga.model;
+package lv.gderuki.saga.step;
 
-import lv.gderuki.saga.service.NotificationService;
+import lv.gderuki.saga.context.OrderSagaContext;
+import lv.gderuki.saga.client.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,8 @@
-package lv.gderuki.saga.service;
+package lv.gderuki.saga.orchestrator;
 
+import lv.gderuki.saga.client.NotificationService;
+import lv.gderuki.saga.client.OrderService;
+import lv.gderuki.saga.client.PaymentService;
 import lv.gderuki.saga.exception.SagaExecutionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
